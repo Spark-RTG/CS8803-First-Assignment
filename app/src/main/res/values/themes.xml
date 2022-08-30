@@ -1,0 +1,49 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.TodoPerfect" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/lightBlue</item>
+        <item name="colorPrimaryVariant">@color/mediumBlue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/standardGreen</item>
+        <item name="colorSecondaryVariant">@color/standardGreen</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="OnePxActivityStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/lightBlue</item>
+        <item name="colorPrimaryVariant">@color/mediumBlue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/standardGreen</item>
+        <item name="colorSecondaryVariant">@color/standardGreen</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
+<!--        &lt;!&ndash; 窗体背景颜色为透明 &ndash;&gt;-->
+<!--        <item name="android:windowBackground">@android:color/transparent</item>-->
+<!--        &lt;!&ndash; 窗体没有边框 &ndash;&gt;-->
+<!--        <item name="android:windowFrame">@null</item>-->
+<!--        &lt;!&ndash; 窗体不包含标题栏 &ndash;&gt;-->
+<!--        <item name="android:windowNoTitle">true</item>-->
+        <!-- 窗体悬浮 -->
+        <item name="android:windowIsFloating">true</item>
+<!--        &lt;!&ndash; 自定义TitleBar时去掉多余的阴影&ndash;&gt;-->
+<!--        <item name="android:windowContentOverlay">@null</item>-->
+<!--        &lt;!&ndash; 不允许窗体背景变暗&ndash;&gt;-->
+<!--        <item name="android:backgroundDimEnabled">false</item>-->
+<!--        &lt;!&ndash; 窗体切换无动画&ndash;&gt;-->
+<!--        <item name="android:windowAnimationStyle">@null</item>-->
+<!--        &lt;!&ndash; 禁用窗口的预览动画&ndash;&gt;-->
+<!--        <item name="android:windowDisablePreview">true</item>-->
+<!--        <item name="android:windowNoDisplay">false</item>-->
+<!--        <item name="android:windowIsTranslucent">true</item>-->
+    </style>
+
+</resources>

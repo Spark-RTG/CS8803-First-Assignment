@@ -1,0 +1,2 @@
+rootProject.name = "TodoPerfect"
+include ':app'
