@@ -85,7 +85,9 @@ class LoginActivity : AppCompatActivity() {
         viewModel.userLiveData.observe(this) { result ->
             val user = result.getOrNull()
             if (user != null) {
-                // TODO: connect main activity
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("user", user)
+                startActivity(intent)
             } else {
                 coverLayout.visibility = View.GONE
             }
@@ -167,7 +169,8 @@ class LoginActivity : AppCompatActivity() {
     private fun loginRegisterSuccess(email: String) {
         val user = User(email)
         SharedPreference.saveUser(user)
-        // TODO: connect main activity
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     private fun setUpEdits() {
