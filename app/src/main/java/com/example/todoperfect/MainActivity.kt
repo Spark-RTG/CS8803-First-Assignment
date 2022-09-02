@@ -1,38 +1,25 @@
 package com.example.todoperfect
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.RingtoneManager
 import android.os.*
-import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoperfect.logic.model.Task
-import com.example.todoperfect.ui.todolist.TaskAdapter
-import com.example.todoperfect.ui.todolist.TodoListViewModel
-import com.example.todoperfect.ui.todolist.TodoListViewModelFactory
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.title.*
-import java.sql.Timestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var viewModel: TodoListViewModel
-    var editingAdapter: TaskAdapter? = null
+    lateinit var viewModel: TodoListViewModel // TODO: add viewmodal for the main activity
+    var editingAdapter: TaskAdapter? = null // TODO: add listview adapter for all list views
     private val taskLists = ArrayList<ArrayList<Task>>()
     val adapters = ArrayList<TaskAdapter>()
     private val recyclers = ArrayList<RecyclerView>()
@@ -51,16 +38,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewModel = ViewModelProvider(this, TodoListViewModelFactory())
-            .get(TodoListViewModel::class.java)
         initList()
         initRecyclers()
         initLines()
-        initNotificationChannel()
-        setUpPeriodicalUpdate()
         setUpClickEvents()
         setUpStatusBar()
-        setUpRefresh()
         refreshTaskList()
     }
 
@@ -95,7 +77,6 @@ class MainActivity : AppCompatActivity() {
             "What we think, we become.",
             "All limitations are self-imposed.",
             "Be so good they can’t ignore you.",
-//          "Yesterday you said tomorrow. Just do it.",
             "Any noble work is impossible at first.",
             "Just do it!",
             "Strive for greatness.",
@@ -151,19 +132,6 @@ class MainActivity : AppCompatActivity() {
         menuBtn.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
-        addBtn.setOnClickListener {
-            val intent = Intent(this, AddActivity::class.java)
-            startAdd.launch(intent)
-        }
-        editModeBtn.setOnClickListener {
-            TaskAdapter.editMode = !(TaskAdapter.editMode)
-            TaskAdapter.taskEditing = null
-            notifyAdapters()
-        }
-        mainView.setOnClickListener {
-            TaskAdapter.taskEditing = null
-            notifyAdapters()
-        }
     }
 
     private fun setUpStatusBar() {
@@ -189,9 +157,6 @@ class MainActivity : AppCompatActivity() {
                     return false
                 }
             }
-        }
-        for (i in 0..5) {
-            adapters.add(TaskAdapter(taskLists[i], this))
         }
         for (i in 0..5) {
             recyclers[i].adapter = adapters[i]
