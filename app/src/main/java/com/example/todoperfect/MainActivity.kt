@@ -18,7 +18,7 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var viewModel: TodoListViewModel // TODO: add viewmodal for the main activity
+    lateinit var viewModel: TodoListViewModel // TODO: add viewmodel for the main activity
     var editingAdapter: TaskAdapter? = null // TODO: add listview adapter for all list views
     private val taskLists = ArrayList<ArrayList<Task>>()
     val adapters = ArrayList<TaskAdapter>()
