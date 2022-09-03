@@ -18,7 +18,7 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var viewModel: TodoListViewModel // TODO: add viewmodel for the main activity
+    lateinit var viewModel: TodoListViewModel 
     var editingAdapter: TaskAdapter? = null // TODO: add listview adapter for all list views
     private val taskLists = ArrayList<ArrayList<Task>>()
     val adapters = ArrayList<TaskAdapter>()
@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        viewModel = ViewModelProvider(this, TodoListViewModelFactory())
+            .get(TodoListViewModel::class.java)
         initList()
         initRecyclers()
         initLines()
