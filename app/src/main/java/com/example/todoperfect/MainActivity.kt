@@ -1,15 +1,25 @@
 package com.example.todoperfect
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.os.*
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoperfect.logic.model.Task
+import com.example.todoperfect.ui.todolist.TaskAdapter
+import com.example.todoperfect.ui.todolist.TodoListViewModel
+import com.example.todoperfect.ui.todolist.TodoListViewModelFactory
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.title.*
@@ -41,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, TodoListViewModelFactory())
             .get(TodoListViewModel::class.java)
         initList()
+        initNotificationChannel()
         initRecyclers()
         initLines()
         setUpClickEvents()
@@ -124,7 +135,24 @@ class MainActivity : AppCompatActivity() {
         titleBarRandomText.text = randomText[Random().nextInt(randomText.size - 1)]
     }
 
-    // TODO: initNotificationChannel
+    private fun initNotificationChannel() {
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel("task_alarm", "Task Alarm",
+                NotificationManager.IMPORTANCE_HIGH)
+            channel.vibrationPattern = longArrayOf(100, 300, 100, 100)
+            channel.lightColor = 6261503 //blue in color.xml
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            channel.setSound(
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build())
+            manager.createNotificationChannel(channel)
+        }
+        manager.cancelAll()
+    }
 
     // TODO: setUpPeriodicalUpdate
 

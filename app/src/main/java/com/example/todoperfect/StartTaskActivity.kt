@@ -4,20 +4,14 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.NotificationManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.graphics.Color
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.IBinder
 import android.view.View
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.todoperfect.logic.model.Task
-import com.example.todoperfect.ui.TimeUpService
 import com.example.todoperfect.ui.start.StartTaskViewModel
 import com.example.todoperfect.ui.start.StartTaskViewModelFactory
 import com.google.android.material.snackbar.Snackbar
@@ -164,7 +158,7 @@ class StartTaskActivity : AppCompatActivity() {
         val decorView = window.decorView
         decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         window.statusBarColor = Color.TRANSPARENT
     }
