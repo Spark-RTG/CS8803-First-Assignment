@@ -29,7 +29,7 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     lateinit var viewModel: TodoListViewModel 
-    var editingAdapter: TaskAdapter? = null // TODO: add listview adapter for all list views
+    var editingAdapter: TaskAdapter? = null
     private val taskLists = ArrayList<ArrayList<Task>>()
     val adapters = ArrayList<TaskAdapter>()
     private val recyclers = ArrayList<RecyclerView>()
