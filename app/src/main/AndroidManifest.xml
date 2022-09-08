@@ -28,6 +28,49 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".ui.TaskAlarmService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".ui.TimeUpService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".StartTaskActivity"
+            android:launchMode="singleTop" />
+        <activity android:name=".AddActivity" />
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTask"/>
+
+        <receiver
+            android:name=".ui.broadcast.TaskAlarmReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":newinst">
+            <intent-filter>
+                <action android:name="com.example.todoperfect.TASK_ALARM" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ui.broadcast.PermanentServiceReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.todoperfect.TASK_ALARM_SERVICE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ui.broadcast.TimeUpReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.todoperfect.TIME_UP" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
