@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.*
+import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,9 +21,11 @@ import com.example.todoperfect.logic.model.Task
 import com.example.todoperfect.ui.todolist.TaskAdapter
 import com.example.todoperfect.ui.todolist.TodoListViewModel
 import com.example.todoperfect.ui.todolist.TodoListViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.title.*
+import java.sql.Timestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -51,11 +54,13 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, TodoListViewModelFactory())
             .get(TodoListViewModel::class.java)
         initList()
-        initNotificationChannel()
         initRecyclers()
         initLines()
+        initNotificationChannel()
+        setUpPeriodicalUpdate()
         setUpClickEvents()
         setUpStatusBar()
+        setUpRefresh()
         refreshTaskList()
     }
 
@@ -70,14 +75,97 @@ class MainActivity : AppCompatActivity() {
         viewModel.tryUploadBackend()
     }
 
-    // TODO: setUpRefresh
+    private fun setUpRefresh() {
+        swipeRefreshLayout.setColorSchemeResources(R.color.mediumBlue, R.color.yellow, R.color.green)
+        viewModel.backendLiveData.observe(this) { result ->
+            if (result.isSuccess) {
+                val remoteTasks = result.getOrDefault(ArrayList<Task>())
+                val grouped = groupTasks(remoteTasks)
+                refreshRecyclers(grouped)
+                viewModel.sync(remoteTasks)
+            } else {
+                Snackbar.make(swipeRefreshLayout, "Please check your internet!",
+                    Snackbar.LENGTH_SHORT).show()
+            }
+            swipeRefreshLayout.isRefreshing = false
+        }
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshTaskList()
+        }
+    }
 
     private fun refreshTaskList() {
         LogUtil.i("Refreshed")
         viewModel.refreshFromCloud()
     }
 
-    // TODO: groupTasks
+    private fun groupTasks(tasks: List<Task>): ArrayList<List<Task>> {
+        val current = GregorianCalendar()
+        val duplicate = GregorianCalendar()
+        duplicate.set(Calendar.HOUR_OF_DAY, 0)
+        duplicate.set(Calendar.MINUTE, 0)
+        duplicate.set(Calendar.SECOND, 0)
+        duplicate.set(Calendar.MILLISECOND, 0)
+        val now = Timestamp(current.timeInMillis)
+        duplicate.add(Calendar.DAY_OF_MONTH, 1)
+        val tomorrow = Timestamp(duplicate.timeInMillis)
+        duplicate.add(Calendar.DAY_OF_MONTH, 2)
+        val threeDays = Timestamp(duplicate.timeInMillis)
+        duplicate.add(Calendar.DAY_OF_MONTH, 4)
+        val weekLater = Timestamp(duplicate.timeInMillis)
+        val result = ArrayList<List<Task>>()
+        var pointer = 0
+        val overdue = ArrayList<Task>()
+        while (pointer < tasks.size && tasks[pointer].due < now && !tasks[pointer].stared) {
+            overdue.add(tasks[pointer])
+            pointer++
+        }
+        val today = ArrayList<Task>()
+        while (pointer < tasks.size
+            && tasks[pointer].due >= now && tasks[pointer].due < tomorrow
+            && !tasks[pointer].stared
+        ) {
+            today.add(tasks[pointer])
+            pointer++
+        }
+        val recent = ArrayList<Task>()
+        while (pointer < tasks.size
+            && tasks[pointer].due >= tomorrow && tasks[pointer].due < threeDays
+            && !tasks[pointer].stared
+        ) {
+            recent.add(tasks[pointer])
+            pointer++
+        }
+        val inWeek = ArrayList<Task>()
+        while (pointer < tasks.size
+            && tasks[pointer].due >= threeDays && tasks[pointer].due < weekLater
+            && !tasks[pointer].stared
+        ) {
+            inWeek.add(tasks[pointer])
+            pointer++
+        }
+        val future = ArrayList<Task>()
+        while (pointer < tasks.size
+            && tasks[pointer].due >= weekLater
+            && !tasks[pointer].stared
+        ) {
+            future.add(tasks[pointer])
+            pointer++
+        }
+        val stared = ArrayList<Task>()
+        for (task: Task in tasks) {
+            if (task.stared) {
+                stared.add(task)
+            }
+        }
+        result.add(overdue)
+        result.add(today)
+        result.add(recent)
+        result.add(inWeek)
+        result.add(future)
+        result.add(stared)
+        return result
+    }
 
     private fun randomTitleText() {
         val randomText = listOf(
@@ -154,10 +242,64 @@ class MainActivity : AppCompatActivity() {
         manager.cancelAll()
     }
 
-    // TODO: setUpPeriodicalUpdate
+    private fun setUpPeriodicalUpdate() {
+        val timer = Timer()
+        timer.scheduleAtFixedRate(object: TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    viewModel.refresh()
+                }
+            }
+        }, 0,1000)
+        viewModel.taskLiveData.observe(this) { result ->
+            val default = ArrayList<List<Task>>()
+            repeat(6) {
+                default.add(ArrayList())
+            }
+            val generalTaskList = result.getOrDefault(default)
+            refreshRecyclers(generalTaskList)
+        }
+    }
 
-    // TODO: refreshRecyclers
-
+    private fun refreshRecyclers(generalTaskList: ArrayList<List<Task>>) {
+        tomorrowLine.visibility = View.VISIBLE
+        recentLine.visibility = View.VISIBLE
+        weekLine.visibility = View.VISIBLE
+        val linesVisibility = ArrayList<Boolean>()
+        repeat(3) {
+            linesVisibility.add(true)
+        }
+        var temp = false
+        for (i in 0 .. 5) {
+            val previous = ArrayList(taskLists[i])
+            if (previous != generalTaskList[i]) {
+                taskLists[i].clear()
+                taskLists[i].addAll(generalTaskList[i])
+                adapters[i].notifyDataSetChanged()
+            }
+            if (taskLists[i].isEmpty()) {
+                recyclers[i].visibility = View.GONE
+                if (i in 2..4) {
+                    linesVisibility[i - 2] = false
+                }
+            } else {
+                temp = true
+                recyclers[i].visibility = View.VISIBLE
+            }
+        }
+        if (!temp) {
+            TaskAdapter.editMode = false
+        }
+        for (i in 0 .. 2) {
+            when (linesVisibility[i]) {
+                true -> timeLines[i].visibility = View.VISIBLE
+                false -> timeLines[i].visibility = View.GONE
+            }
+        }
+        if (scrollView.scrollY == 0) {
+            titleLayout.setExpanded(true)
+        }
+    }
     private fun setUpClickEvents() {
         menuBtn.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
@@ -193,8 +335,6 @@ class MainActivity : AppCompatActivity() {
         }
         //staredAdapter.add(adapters[5])
     }
-
-    // TODO: fillList
 
     private fun initList() {
         repeat(6) {
