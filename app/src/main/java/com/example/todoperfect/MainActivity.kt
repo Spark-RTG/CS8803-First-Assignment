@@ -31,7 +31,7 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var viewModel: TodoListViewModel 
+    lateinit var viewModel: TodoListViewModel
     var editingAdapter: TaskAdapter? = null
     private val taskLists = ArrayList<ArrayList<Task>>()
     val adapters = ArrayList<TaskAdapter>()
@@ -98,7 +98,6 @@ class MainActivity : AppCompatActivity() {
         LogUtil.i("Refreshed")
         viewModel.refreshFromCloud()
     }
-
     private fun groupTasks(tasks: List<Task>): ArrayList<List<Task>> {
         val current = GregorianCalendar()
         val duplicate = GregorianCalendar()
@@ -178,6 +177,7 @@ class MainActivity : AppCompatActivity() {
             "What we think, we become.",
             "All limitations are self-imposed.",
             "Be so good they can’t ignore you.",
+//          "Yesterday you said tomorrow. Just do it.",
             "Any noble work is impossible at first.",
             "Just do it!",
             "Strive for greatness.",
@@ -231,8 +231,8 @@ class MainActivity : AppCompatActivity() {
             channel.vibrationPattern = longArrayOf(100, 300, 100, 100)
             channel.lightColor = 6261503 //blue in color.xml
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            channel.setSound(
-                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+            //TODO(change the sound)
+            channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -304,6 +304,19 @@ class MainActivity : AppCompatActivity() {
         menuBtn.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
+        addBtn.setOnClickListener {
+            val intent = Intent(this, AddActivity::class.java)
+            startAdd.launch(intent)
+        }
+        editModeBtn.setOnClickListener {
+            TaskAdapter.editMode = !(TaskAdapter.editMode)
+            TaskAdapter.taskEditing = null
+            notifyAdapters()
+        }
+        mainView.setOnClickListener {
+            TaskAdapter.taskEditing = null
+            notifyAdapters()
+        }
     }
 
     private fun setUpStatusBar() {
@@ -331,10 +344,56 @@ class MainActivity : AppCompatActivity() {
             }
         }
         for (i in 0..5) {
+            adapters.add(TaskAdapter(taskLists[i], this))
+        }
+        for (i in 0..5) {
             recyclers[i].adapter = adapters[i]
         }
         //staredAdapter.add(adapters[5])
     }
+
+    private fun fillList() {
+        val duplicate = GregorianCalendar()
+        duplicate.set(Calendar.HOUR_OF_DAY, 0)
+        duplicate.set(Calendar.MINUTE, 0)
+        duplicate.set(Calendar.SECOND, 0)
+        duplicate.set(Calendar.MILLISECOND, 0)
+        duplicate.add(Calendar.DAY_OF_MONTH, -1)
+        val yesterday = Timestamp(duplicate.timeInMillis)
+        duplicate.add(Calendar.DAY_OF_MONTH, 1)
+        val today = Timestamp(duplicate.timeInMillis)
+        val now = Timestamp(GregorianCalendar().timeInMillis + 20000)
+        duplicate.add(Calendar.DAY_OF_MONTH, 1)
+        val tomorrow = Timestamp(duplicate.timeInMillis)
+        duplicate.add(Calendar.DAY_OF_MONTH, 2)
+        val threeDays = Timestamp(duplicate.timeInMillis)
+        duplicate.add(Calendar.DAY_OF_MONTH, 4)
+        val weekLater = Timestamp(duplicate.timeInMillis)
+        val tasks = listOf(
+            Task("Overdue Task", "Overdue task",
+                8, 0, yesterday, Task.TRIVIAL, false),
+            Task("Today Task(Overdue)", "Today task",
+                10, 15, today, Task.NORMAL, false),
+            Task("Current Task", "Current task",
+                5, 20, now, Task.IMPORTANT, false),
+            Task("Tomorrow Task", "Tomorrow task",
+                2, 20, tomorrow, Task.MILESTONE, false),
+            Task("Recent Task", "Recent Task",
+                0, 10, threeDays, Task.MEMORIAL, false),
+            Task("Future Task", "Future Task",
+                5, 10, weekLater, Task.TRIVIAL, false)
+        )
+        for (task in tasks) {
+            viewModel.insertTask(task)
+        }
+    }
+
+//    override fun onStop() {
+//        super.onStop()
+//        for (runnable in runnableList) {
+//            handler.removeCallbacks(runnable)
+//        }
+//    }
 
     private fun initList() {
         repeat(6) {
@@ -356,4 +415,5 @@ class MainActivity : AppCompatActivity() {
     fun refresh() {
         viewModel.refresh()
     }
+
 }

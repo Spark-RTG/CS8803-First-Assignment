@@ -63,4 +63,53 @@ object Cloud {
             }
         }
     }
+
+    fun pullAllTasks(taskPullRequest: TaskPullRequest) = fire(Dispatchers.IO) {
+        coroutineScope {
+            val taskResponse = TodoPerfectNetwork.pullAllTasks(taskPullRequest).body
+            if (taskResponse.statusCode == 200) {
+                val tasks = taskResponse.tasks
+                LogUtil.i("Pulled: $tasks")
+                Result.success(tasks)
+            } else {
+                Result.failure(RuntimeException("Pull failed"))
+            }
+        }
+    }
+
+    suspend fun insertTasks(tasks: List<Task>): String {
+        LogUtil.i("Inserting $tasks")
+        val taskResponse =
+            TodoPerfectNetwork.insertTasks(TaskRequest(TaskRequestBodyJSON(tasks))).body
+        if (taskResponse.statusCode == 200) {
+            return taskResponse.body
+        } else {
+            LogUtil.e(taskResponse.body)
+            throw RuntimeException(taskResponse.body)
+        }
+    }
+
+    suspend fun updateTasks(tasks: List<Task>): String {
+        LogUtil.i("Updating $tasks")
+        val taskResponse =
+            TodoPerfectNetwork.updateTasks(TaskRequest(TaskRequestBodyJSON(tasks))).body
+        if (taskResponse.statusCode == 200) {
+            return taskResponse.body
+        } else {
+            LogUtil.e(taskResponse.body)
+            throw RuntimeException(taskResponse.body)
+        }
+    }
+
+    suspend fun deleteTasks(tasks: List<Task>): String {
+        LogUtil.i("Deleting $tasks")
+        val taskResponse =
+            TodoPerfectNetwork.deleteTasks(TaskRequest(TaskRequestBodyJSON(tasks))).body
+        if (taskResponse.statusCode == 200) {
+            return taskResponse.body
+        } else {
+            LogUtil.e(taskResponse.body)
+            throw RuntimeException(taskResponse.body)
+        }
+    }
 }

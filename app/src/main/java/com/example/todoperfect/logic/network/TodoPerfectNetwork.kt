@@ -12,6 +12,7 @@ import kotlin.coroutines.suspendCoroutine
 
 object TodoPerfectNetwork {
     private val userService = ServiceCreator.create<UserService>()
+    private val taskService = ServiceCreator.create<TaskService>()
 
     private suspend fun <T> Call<T>.await(): T {
         return suspendCoroutine { continuation ->
@@ -37,4 +38,13 @@ object TodoPerfectNetwork {
         userService.userRegister(userRequest).await()
     suspend fun userVerify(verifyRequest: VerifyRequest) =
         userService.userVerify(verifyRequest).await()
+
+    suspend fun pullAllTasks(taskPullRequest: TaskPullRequest) =
+        taskService.pullAllTasks(taskPullRequest).await()
+    suspend fun insertTasks(taskRequest: TaskRequest) =
+        taskService.insertTasks(taskRequest).await()
+    suspend fun updateTasks(taskRequest: TaskRequest) =
+        taskService.updateTasks(taskRequest).await()
+    suspend fun deleteTasks(taskRequest: TaskRequest) =
+        taskService.deleteTasks(taskRequest).await()
 }
