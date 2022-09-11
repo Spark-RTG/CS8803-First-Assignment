@@ -6,6 +6,10 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/mainView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -253,6 +257,7 @@
             </androidx.core.widget.NestedScrollView>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -261,8 +266,10 @@
         android:focusable="true"
         android:paddingTop="25dp"
         android:background="@drawable/background_gradient">
-        <FrameLayout
-            android:layout_width="300dp"
+        <fragment
+            android:id="@+id/settingsFragment"
+            android:name="com.example.todoperfect.SettingsFragment"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
     </FrameLayout>
